@@ -8,6 +8,10 @@ backend:
   baseUrl: ${APP_BASE_URL}
   # Railway sets PORT; default 7007 for local runs.
   listen: ':${PORT:-7007}'
+  auth:
+    # Demo-only: disable backend auth policy so proxy endpoints
+    # like /api/proxy/airflow can be called without Backstage tokens.
+    dangerouslyDisableDefaultAuthPolicy: true
   # Allow same-origin requests when app is served from backend (Railway).
   cors:
     origin: ${APP_BASE_URL}

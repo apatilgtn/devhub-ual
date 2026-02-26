@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: bookinfo
+  description: Istio Bookinfo sample application
+  annotations:
+    backstage.io/kubernetes-id: bookinfo
+    backstage.io/techdocs-ref: dir:.
+    airflow/dag-id: example_dag
+spec:
+  type: service
+  lifecycle: experimental
+  owner: user:default/admin

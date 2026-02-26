@@ -1,0 +1,191 @@
+app:
+  title: DevHub - Developer Portal
+  baseUrl: http://localhost:3000
+
+organization:
+  name: DevHub
+
+backend:
+  # Used for enabling authentication, secret is shared by all backend plugins
+  # See https://backstage.io/docs/auth/service-to-service-auth for
+  # information on the format
+  # auth:
+  #   keys:
+  #     - secret: ${BACKEND_SECRET}
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+    # Uncomment the following host directive to bind to specific interfaces
+    # host: 127.0.0.1
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+    # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
+    # Default Helmet Content-Security-Policy values can be removed by setting the key to false
+  cors:
+    origin: http://localhost:3000
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  # This is for local development only, it is not recommended to use this in production
+  # The production database configuration is stored in app-config.production.yaml
+  # For local dev, set POSTGRES_* in .env or use app-config.local.yaml
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST:-localhost}
+      port: ${POSTGRES_PORT:-5432}
+      user: ${POSTGRES_USER:-postgres}
+      password: ${POSTGRES_PASSWORD}
+      ssl:
+        rejectUnauthorized: false
+      base: postgres
+
+integrations:
+  github:
+    - host: github.com
+      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
+      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
+      token: ${GITHUB_TOKEN}
+    ### Example for how to add your GitHub Enterprise instance using the API:
+    # - host: ghe.example.net
+    #   apiBaseUrl: https://ghe.example.net/api/v3
+    #   token: ${GHE_TOKEN}
+
+proxy:
+  ### Example for how to add a proxy endpoint for the frontend.
+  ### A typical reason to do this is to handle HTTPS and CORS for internal services.
+  endpoints:
+    '/grafana/api':
+      target: http://localhost:3001
+      allowedHeaders:
+        - Authorization
+      headers:
+        Authorization: Bearer ${GRAFANA_TOKEN:-}
+    
+    # Apache Airflow API proxy (set AIRFLOW_BASIC_AUTH if needed)
+    '/airflow':
+      target: http://localhost:8080
+      changeOrigin: true
+      secure: false
+      timeout: 30000
+      headers:
+        Authorization: Basic ${AIRFLOW_BASIC_AUTH:-}
+
+    # Prometheus proxy
+    '/prometheus/api':
+      target: http://localhost:9090
+
+    # Elasticsearch proxy for status page
+    '/elasticsearch':
+      target: http://localhost:9200
+      headers:
+        Authorization: Basic ${ELASTICSEARCH_BASIC_AUTH:-}
+
+    # OpenMetadata API proxy
+    '/openmetadata':
+      target: http://localhost:8585
+      changeOrigin: true
+      secure: false
+      allowedMethods: ['GET', 'POST']
+      headers:
+        Authorization: 'Bearer ${OPENMETADATA_TOKEN:-}'
+      pathRewrite:
+        '^/api/proxy/openmetadata': ''
+
+
+# Apache Airflow configuration
+apacheAirflow:
+  baseUrl: ${AIRFLOW_URL:-http://localhost:8080}
+
+# Grafana configuration
+grafana:
+  # Frontend URL for linking to Grafana dashboards
+  domain: http://localhost:3001
+  # Unified alerting is default in Grafana 9+
+  unifiedAlerting: true
+
+# Reference documentation http://backstage.io/docs/features/techdocs/configuration
+# Note: After experimenting with basic setup, use CI/CD to generate docs
+# and an external cloud storage when deploying TechDocs for production use-case.
+# https://backstage.io/docs/features/techdocs/how-to-guides#how-to-migrate-from-techdocs-basic-to-recommended-deployment-approach
+techdocs:
+  builder: 'local' # Alternatives - 'external'
+  generator:
+    runIn: 'local' # Changed from docker to local
+  publisher:
+    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+
+# Supabase Auth (used by CustomSignInPage / LogoutPage). Optional: set SUPABASE_* in Railway for production.
+supabase:
+  url: ${SUPABASE_URL:-https://bbcnahjnozxlnnziyjsq.supabase.co}
+  anonKey: ${SUPABASE_ANON_KEY:-sb_publishable_Ojq5sEq-oKFEdSSYZK5Kew_613P3U_8}
+
+auth:
+  # see https://backstage.io/docs/auth/ to learn about auth providers
+  providers:
+    # See https://backstage.io/docs/auth/guest/provider
+    guest: {}
+    github:
+      development:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
+
+scaffolder:
+  # see https://backstage.io/docs/features/software-templates/configuration for software template options
+
+search:
+  elasticsearch:
+    node: http://localhost:9200
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location]
+  locations:
+    # Local example data, file locations are relative to the backend process, typically `packages/backend`
+    - type: file
+      target: ../../examples/entities.yaml
+
+    # Local example template
+    - type: file
+      target: ../../examples/template/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Local example organizational data
+    - type: file
+      target: ../../examples/org.yaml
+      rules:
+        - allow: [User, Group]
+
+    # Local bookinfo component
+    - type: file
+      target: ../../examples/bookinfo-catalog-info.yaml
+
+    ## Uncomment these lines to add more example data
+    # - type: url
+    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
+
+    ## Uncomment these lines to add an example org
+    # - type: url
+    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
+    #   rules:
+    #     - allow: [User, Group]
+
+kubernetes:
+  serviceLocatorMethod:
+    type: 'multiTenant'
+  clusterLocatorMethods:
+    - type: 'config'
+      clusters:
+        - url: https://127.0.0.1:6443
+          name: rancher-desktop
+          authProvider: 'serviceAccount'
+          serviceAccountToken: eyJhbGciOiJSUzI1NiIsImtpZCI6ImFlT2tzQWNUdnE4bUJyRDd3c3dwa21uWU1nY3FyUi00UFVWRUdOZkVPazAifQ.eyJhdWQiOlsiaHR0cHM6Ly9rdWJlcm5ldGVzLmRlZmF1bHQuc3ZjLmNsdXN0ZXIubG9jYWwiLCJrM3MiXSwiZXhwIjoxODAyNDMzNDc2LCJpYXQiOjE3NzA4OTc0NzYsImlzcyI6Imh0dHBzOi8va3ViZXJuZXRlcy5kZWZhdWx0LnN2Yy5jbHVzdGVyLmxvY2FsIiwianRpIjoiZjg4ZjQxZTQtMTc0MC00ZThmLWFmYTEtZGE4ODdlZTUyYjU2Iiwia3ViZXJuZXRlcy5pbyI6eyJuYW1lc3BhY2UiOiJkZWZhdWx0Iiwic2VydmljZWFjY291bnQiOnsibmFtZSI6ImJhY2tzdGFnZS1hZG1pbiIsInVpZCI6IjgwYmQ4NGMwLWUyNDgtNDFmYi1hMTEwLTEzZDBiZWRjMTNjOSJ9fSwibmJmIjoxNzcwODk3NDc2LCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6ZGVmYXVsdDpiYWNrc3RhZ2UtYWRtaW4ifQ.dB_7dMIguBi3Fsrg4VaFUNc1fleeOyama34hz-8IXaBOo9Zv2Wm6b_VXcu13OeROmXT5-VgmV5nLNPjy0f7TgDlmRwr5bQr61A9a0tRc5PHuMMzHHsQEcBfxhoQf5u7bLAXNL-dw-yD6c269wLlPk6yIuHIVJQcEaw5myvRJDfkgZPiTLXrCSAyJrJ-k_pqpUW-iC4bo6Dx1koAPoKWXdlLkpgaSvrlr1e_8HeEgnnAjUwfLtFM5qaz8OVR0K5VFpby04-no72FP84q7N-BWHfrmFH7WBkN3HfgfAtsJxpLqNlIcV0iObloyYq_wY57NE4HfLcjXwCmMlwuWw9hrog
+          skipTLSVerify: true
+
+# see https://backstage.io/docs/permissions/getting-started for more on the permission framework
+permission:
+  # setting this to `false` will disable permissions
+  enabled: true

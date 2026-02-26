@@ -1,0 +1,31 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Backstage",
+			"type": "shell",
+			"command": "yarn start",
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Start Backstage",
+			"type": "shell",
+			"command": "kill -9 $(lsof -ti :3000) 2>/dev/null; kill -9 $(lsof -ti :7007) 2>/dev/null; sleep 1; cd /Users/454469/Downloads/Personal/Backstage-onebhoomi/onebhoomi && yarn start",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "backstage-start",
+			"type": "shell",
+			"command": "kill -9 $(lsof -ti :3000) 2>/dev/null; kill -9 $(lsof -ti :7007) 2>/dev/null; sleep 1; yarn start",
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc"
+			]
+		}
+	]
+}

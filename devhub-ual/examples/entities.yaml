@@ -1,0 +1,342 @@
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-system
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: examples
+spec:
+  owner: guests
+---
+# Platform System - groups all platform services
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: platform
+  description: Core platform services and infrastructure
+spec:
+  owner: platform-team
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: example-website
+  annotations:
+    # Source code location
+    backstage.io/source-location: url:https://github.com/backstage/backstage
+    # Kubernetes
+    backstage.io/kubernetes-id: example-website
+    backstage.io/kubernetes-namespace: default
+    backstage.io/kubernetes-label-selector: 'app=example-website'
+    # GitHub - for CI/CD
+    github.com/project-slug: backstage/backstage
+    # Grafana
+    grafana/dashboard-selector: 'example-website'
+    grafana/alert-label-selector: 'service=example-website'
+  links:
+    - url: https://github.com/backstage/backstage
+      title: GitHub Repository
+      icon: github
+    - url: https://backstage.io
+      title: Documentation
+      icon: docs
+spec:
+  type: website
+  lifecycle: experimental
+  owner: guests
+  system: examples
+  providesApis: [example-grpc-api]
+---
+# API Gateway Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: api-gateway
+  description: Central API Gateway for routing and rate limiting
+  annotations:
+    # Source code location
+    backstage.io/source-location: url:https://github.com/onebhoomi/api-gateway
+    # TechDocs - local documentation
+    backstage.io/techdocs-ref: dir:docs/api-gateway
+    # Kubernetes
+    backstage.io/kubernetes-id: api-gateway
+    backstage.io/kubernetes-namespace: production
+    backstage.io/kubernetes-label-selector: 'app=api-gateway'
+    # GitHub
+    github.com/project-slug: onebhoomi/api-gateway
+    # Grafana integration
+    grafana/dashboard-selector: 'api-gateway'
+    grafana/alert-label-selector: 'service=api-gateway'
+    grafana/overview-dashboard: 'api-gateway-metrics'
+    prometheus.io/rule: 'api-gateway'
+    prometheus.io/alert: 'all'
+  links:
+    - url: https://github.com/onebhoomi/api-gateway
+      title: GitHub Repository
+      icon: github
+    - url: http://localhost:3001/d/api-gateway-metrics
+      title: Grafana Dashboard
+      icon: dashboard
+  tags:
+    - api
+    - gateway
+    - infrastructure
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: platform
+---
+# User Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: user-service
+  description: User authentication and profile management service
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/user-service
+    backstage.io/kubernetes-id: user-service
+    backstage.io/kubernetes-namespace: production
+    backstage.io/kubernetes-label-selector: 'app=user-service'
+    github.com/project-slug: onebhoomi/user-service
+    grafana/dashboard-selector: 'user-service'
+    grafana/alert-label-selector: 'service=user-service'
+    grafana/overview-dashboard: 'user-service-dashboard'
+    prometheus.io/rule: 'user-service'
+    prometheus.io/alert: 'all'
+  links:
+    - url: https://github.com/onebhoomi/user-service
+      title: GitHub Repository
+      icon: github
+  tags:
+    - users
+    - authentication
+    - backend
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: platform
+  dependsOn:
+    - component:api-gateway
+---
+# Payment Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-service
+  description: Payment processing and transaction management
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/payment-service
+    backstage.io/kubernetes-id: payment-service
+    backstage.io/kubernetes-namespace: production
+    backstage.io/kubernetes-label-selector: 'app=payment-service'
+    github.com/project-slug: onebhoomi/payment-service
+    grafana/dashboard-selector: 'payment-service'
+    grafana/alert-label-selector: 'service=payment-service'
+    grafana/overview-dashboard: 'payment-service-dashboard'
+    prometheus.io/rule: 'payment-service'
+    prometheus.io/alert: 'all'
+  links:
+    - url: https://github.com/onebhoomi/payment-service
+      title: GitHub Repository
+      icon: github
+  tags:
+    - payments
+    - transactions
+    - critical
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: platform
+  dependsOn:
+    - component:api-gateway
+    - component:user-service
+---
+# Notification Service
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: notification-service
+  description: Email, SMS, and push notification delivery
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/notification-service
+    backstage.io/kubernetes-id: notification-service
+    backstage.io/kubernetes-namespace: production
+    backstage.io/kubernetes-label-selector: 'app=notification-service'
+    github.com/project-slug: onebhoomi/notification-service
+    grafana/dashboard-selector: 'notification-service'
+    grafana/alert-label-selector: 'service=notification-service'
+    grafana/overview-dashboard: 'notification-service-dashboard'
+    prometheus.io/rule: 'notification-service'
+    prometheus.io/alert: 'all'
+  links:
+    - url: https://github.com/onebhoomi/notification-service
+      title: GitHub Repository
+      icon: github
+  tags:
+    - notifications
+    - messaging
+    - async
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: platform
+  dependsOn:
+    - component:api-gateway
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-api
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: example-grpc-api
+  annotations:
+    backstage.io/source-location: url:https://github.com/backstage/backstage/tree/master/packages/catalog-model/examples
+spec:
+  type: grpc
+  lifecycle: experimental
+  owner: guests
+  system: examples
+  definition: |
+    syntax = "proto3";
+
+    service Exampler {
+      rpc Example (ExampleMessage) returns (ExampleMessage) {};
+    }
+
+    message ExampleMessage {
+      string example = 1;
+    };
+---
+# ==========================================
+# DATA CATALOG - Databases & Datasets
+# ==========================================
+
+# Data System - groups all data assets
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: data-platform
+  description: Data infrastructure, databases, and datasets
+spec:
+  owner: platform-team
+---
+# Customers Database
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: customers-database
+  description: Primary customer data store with profiles, preferences, and contact information
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/data-schemas/tree/main/customers
+  tags:
+    - database
+    - postgresql
+    - customers
+    - pii
+  links:
+    - url: http://localhost:5601/app/discover#/?_a=(index:'customers-*')
+      title: View in Kibana
+      icon: dashboard
+spec:
+  type: database
+  owner: user-service
+  system: data-platform
+  dependencyOf:
+    - component:user-service
+    - component:payment-service
+---
+# Orders Dataset
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: orders-dataset
+  description: Transaction and order history data for analytics and reporting
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/data-schemas/tree/main/orders
+  tags:
+    - dataset
+    - analytics
+    - orders
+    - transactions
+  links:
+    - url: http://localhost:5601/app/discover#/?_a=(index:'orders-*')
+      title: View in Kibana
+      icon: dashboard
+spec:
+  type: dataset
+  owner: payment-service
+  system: data-platform
+  dependencyOf:
+    - component:payment-service
+    - component:notification-service
+---
+# User Events Stream
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: user-events-stream
+  description: Real-time user activity events for analytics and personalization
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/data-schemas/tree/main/events
+  tags:
+    - stream
+    - kafka
+    - events
+    - real-time
+spec:
+  type: stream
+  owner: api-gateway
+  system: data-platform
+  dependencyOf:
+    - component:api-gateway
+    - component:user-service
+---
+# Notifications Log
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: notifications-log
+  description: Historical log of all sent notifications (email, SMS, push)
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/data-schemas/tree/main/notifications
+  tags:
+    - dataset
+    - logs
+    - notifications
+    - elasticsearch
+  links:
+    - url: http://localhost:5601/app/discover#/?_a=(index:'notifications-*')
+      title: View in Kibana
+      icon: dashboard
+spec:
+  type: dataset
+  owner: notification-service
+  system: data-platform
+  dependencyOf:
+    - component:notification-service
+---
+# Analytics Data Warehouse
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: analytics-warehouse
+  description: Central data warehouse for business intelligence and reporting
+  annotations:
+    backstage.io/source-location: url:https://github.com/onebhoomi/data-schemas/tree/main/warehouse
+  tags:
+    - database
+    - warehouse
+    - analytics
+    - bigquery
+  links:
+    - url: http://localhost:3001/d/analytics-dashboard
+      title: Analytics Dashboard
+      icon: dashboard
+spec:
+  type: database
+  owner: platform-team
+  system: data-platform
+

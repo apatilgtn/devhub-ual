@@ -1,0 +1,17 @@
+# Fallback when not using Dockerfile (e.g. Nixpacks builder)
+# Set Railway service Root Directory to devhub-ual when deploying from repo root.
+
+[phases.setup]
+nixPkgs = ["nodejs_22", "yarn"]
+
+[phases.install]
+cmds = ["yarn install --immutable"]
+
+[phases.build]
+cmds = ["yarn tsc", "yarn build:backend"]
+
+[start]
+cmd = "node packages/backend --config app-config.yaml --config app-config.production.yaml"
+
+[variables]
+NODE_ENV = "production"

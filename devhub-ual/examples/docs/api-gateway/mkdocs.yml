@@ -1,0 +1,11 @@
+site_name: API Gateway Documentation
+site_description: Documentation for the API Gateway service
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - API Reference: api-reference.md
+  - Configuration: configuration.md
+
+plugins:
+  - techdocs-core

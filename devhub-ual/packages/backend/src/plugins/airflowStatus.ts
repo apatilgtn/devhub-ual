@@ -63,7 +63,10 @@ export default createBackendModule({
             res.status(response.status).json(body);
           } catch (error: any) {
             logger.error(`Error fetching Airflow health: ${error?.message}`);
-            res.status(500).json({ error: 'Failed to fetch Airflow health' });
+            res.status(500).json({
+              error: 'Failed to fetch Airflow health',
+              detail: error?.message ?? String(error),
+            });
           }
         });
 
@@ -82,7 +85,10 @@ export default createBackendModule({
             res.status(response.status).json(body);
           } catch (error: any) {
             logger.error(`Error fetching Airflow DAGs: ${error?.message}`);
-            res.status(500).json({ error: 'Failed to fetch Airflow DAGs' });
+            res.status(500).json({
+              error: 'Failed to fetch Airflow DAGs',
+              detail: error?.message ?? String(error),
+            });
           }
         });
 

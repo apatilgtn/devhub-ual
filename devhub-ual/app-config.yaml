@@ -132,9 +132,11 @@ auth:
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
+# Search: PG used when search.pg is set (e.g. production); else Elasticsearch if node set
 search:
   elasticsearch:
     node: http://localhost:9200
+  # pg (production): uses backend database; set in app-config.production.yaml
 
 catalog:
   import:

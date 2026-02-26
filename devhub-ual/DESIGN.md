@@ -67,6 +67,11 @@ The Railway MCP server lets the AI assistant:
 
 Setup: ensure `.cursor/mcp.json` includes the Railway MCP server and Railway CLI is installed and logged in. See `docs/RAILWAY_MCP.md` in repo root.
 
+## Solution design and multi-service
+
+- **What’s implemented:** DevHub UAL on Railway, Supabase auth + Postgres, env-based config, docs. See **`docs/SOLUTION_DESIGN_AND_IMPLEMENTATION.md`**.
+- **Adding more apps:** Same Railway project can run multiple services (e.g. a second app with `app/`, `components/`, api-explorer, auth). Add a new service from the same or another repo and set Root Directory and variables. Details in the same doc.
+
 ## File map
 
 - `railway.json` – Railway build/start and root directory
@@ -76,6 +81,7 @@ Setup: ensure `.cursor/mcp.json` includes the Railway MCP server and Railway CLI
 - `.env.example` – Env var reference (copy to `.env` for local dev)
 - `.cursor/mcp.json` – Cursor Railway MCP config (at repo root)
 - `docs/RAILWAY_MCP.md` – Railway MCP setup and deploy steps
+- `docs/SOLUTION_DESIGN_AND_IMPLEMENTATION.md` – What’s deployed, checklist, adding more services
 
 ## Local development
 

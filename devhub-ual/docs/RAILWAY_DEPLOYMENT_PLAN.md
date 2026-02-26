@@ -73,11 +73,15 @@ If these are not set, the app falls back to the values in app-config/code (exist
 - **CORS** – Production config sets `backend.cors.origin` to `APP_BASE_URL` so the auth bridge request from the app is allowed on Railway.
 - **Supabase redirect URLs** – If you use Supabase redirects (e.g. email magic link), add your Railway URL in Supabase: **Authentication** → **URL configuration** → **Redirect URLs**: `https://<your-railway-domain>/` (and same with `http` if needed for local dev).
 
-### 9. Post-deploy
+### 9. Target port (Networking)
+
+- The app listens on **`PORT`** (set by Railway; often **8080**). In the service **Settings → Networking**, set **Target port** to **8080** (or whatever your deploy logs show: “Listening on :XXXX”). If you see “Listening on :8080” but Target port is 7007, change it to 8080 so the gateway routes correctly.
+
+### 10. Post-deploy
 
 - Open **`APP_BASE_URL`** in the browser.
 - Log in via the Supabase-backed CustomSignInPage (email/password or sign-up).
-- Backend uses Supabase Postgres for Backstage data.
+- Backend uses Supabase Postgres for Backstage data and for **search** (no Elasticsearch required in production).
 
 ---
 
@@ -90,3 +94,5 @@ If these are not set, the app falls back to the values in app-config/code (exist
 | Build             | `Dockerfile.railway` (root `devhub-ual`). |
 | Port / URL        | Railway sets `PORT`; you set `APP_BASE_URL` after generating a domain. |
 | Secrets           | Prefer env vars in Railway for DB, Supabase Auth, and GitHub. |
+| Search            | PostgreSQL (no Elasticsearch in production); catalog and techdocs search work via DB. |
+| Port              | App uses Railway’s PORT (often 8080); set Networking → Target port to match (e.g. 8080). |

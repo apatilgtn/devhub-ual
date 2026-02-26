@@ -36,7 +36,17 @@ supabase:
 
 auth:
   providers:
-    guest: {}
+    guest:
+      # WARNING: This is for demo/non-production use only.
+      # Allows the Backstage guest auth provider to be used outside
+      # of a development environment (e.g. on Railway).
+      dangerouslyAllowOutsideDevelopment: true
+
+# Use PostgreSQL for search in production (no Elasticsearch required)
+search:
+  pg:
+    highlightOptions:
+      useHighlight: false
 
 catalog:
   # Overrides the default list locations from app-config.yaml as these contain example data.

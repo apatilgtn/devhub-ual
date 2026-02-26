@@ -10,19 +10,24 @@ declare const fetch: any;
  * Routes (mounted under /api/airflowstatus):
  *   GET /health  -> proxies to <apacheAirflow.baseUrl>/api/v1/health
  *   GET /dags    -> proxies to <apacheAirflow.baseUrl>/api/v1/dags
+ *
+ * NOTE: We attach to the rootHttpRouter under /api/airflowstatus so that
+ * the routes are always available regardless of plugin configuration.
  */
 
 export default createBackendModule({
-  pluginId: 'airflowstatus',
+  // Attach as a module to the existing "app" plugin; we only use the
+  // rootHttpRouter so the pluginId choice is not visible externally.
+  pluginId: 'app',
   moduleId: 'airflow-status',
   register(env) {
     env.registerInit({
       deps: {
-        http: coreServices.httpRouter,
+        rootHttpRouter: coreServices.rootHttpRouter,
         logger: coreServices.logger,
         config: coreServices.rootConfig,
       },
-      async init({ http, logger, config }) {
+      async init({ rootHttpRouter, logger, config }) {
         const airflowConfig = config.getOptionalConfig('apacheAirflow');
 
         if (!airflowConfig) {
@@ -82,7 +87,7 @@ export default createBackendModule({
         });
 
         // Mount under /api/airflowstatus
-        http.use(router);
+        rootHttpRouter.use('/api/airflowstatus', router);
 
         logger.info('Airflow status backend module initialized at /api/airflowstatus');
       },

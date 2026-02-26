@@ -101,6 +101,7 @@ proxy:
 # Apache Airflow configuration
 apacheAirflow:
   baseUrl: ${AIRFLOW_URL:-http://localhost:8080}
+  basicAuthHeader: ${AIRFLOW_BASIC_AUTH:-}
 
 # Grafana configuration
 grafana:

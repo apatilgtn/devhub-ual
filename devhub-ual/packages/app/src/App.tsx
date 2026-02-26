@@ -39,7 +39,7 @@ import { UnifiedThemeProvider } from '@backstage/theme';
 import { NotificationsPage } from '@backstage/plugin-notifications';
 import { SignalsDisplay } from '@backstage/plugin-signals';
 import { devHubTheme, devHubLightTheme } from './theme';
-import { ApacheAirflowPage } from '@backstage-community/plugin-apache-airflow';
+import { AirflowStatusPage } from './components/airflow/AirflowStatusPage';
 import { ElasticsearchPage } from './components/elasticsearch/ElasticsearchPage';
 import { KibanaPage } from './components/kibana/KibanaPage';
 import { DataCatalogPage } from './components/datacatalog/DataCatalogPage';
@@ -125,7 +125,7 @@ const routes = (
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
     <Route path="/notifications" element={<NotificationsPage />} />
-    <Route path="/airflow" element={<ApacheAirflowPage />} />
+    <Route path="/airflow" element={<AirflowStatusPage />} />
     <Route path="/elasticsearch" element={<ElasticsearchPage />} />
     <Route path="/kibana" element={<KibanaPage />} />
     <Route path="/data-catalog" element={<DataCatalogPage />} />

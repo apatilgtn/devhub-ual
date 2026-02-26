@@ -66,6 +66,9 @@ proxy:
       # In production, AIRFLOW_URL points at the Railway Airflow service.
       # The proxy forwards /api/proxy/airflow/* to the Airflow stable REST API.
       target: ${AIRFLOW_URL:-http://localhost:8080}/api/v1
+      # For the demo, allow unauthenticated access from Backstage to this proxy.
+      # Airflow itself is still protected by BASIC auth via AIRFLOW_BASIC_AUTH.
+      credentials: dangerously-allow-unauthenticated
       changeOrigin: true
       secure: true
       timeout: 30000

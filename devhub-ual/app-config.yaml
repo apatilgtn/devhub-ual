@@ -63,12 +63,15 @@ proxy:
     
     # Apache Airflow API proxy (set AIRFLOW_BASIC_AUTH if needed)
     '/airflow':
-      target: http://localhost:8080
+      # In production, AIRFLOW_URL points at the Railway Airflow service.
+      # The proxy forwards /api/proxy/airflow/* to the Airflow stable REST API.
+      target: ${AIRFLOW_URL:-http://localhost:8080}/api/v1
       changeOrigin: true
-      secure: false
+      secure: true
       timeout: 30000
       headers:
-        Authorization: Basic ${AIRFLOW_BASIC_AUTH:-}
+        # e.g. "Basic base64(username:password)"; set AIRFLOW_BASIC_AUTH in env.
+        Authorization: ${AIRFLOW_BASIC_AUTH:-}
 
     # Prometheus proxy
     '/prometheus/api':

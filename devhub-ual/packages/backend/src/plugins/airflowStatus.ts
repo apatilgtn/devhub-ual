@@ -59,7 +59,13 @@ export default createBackendModule({
             const response = await fetch(`${baseUrl}/api/v1/health`, {
               headers: buildHeaders(),
             });
-            const body = await response.json();
+            const text = await response.text();
+            let body: any;
+            try {
+              body = JSON.parse(text);
+            } catch {
+              body = { raw: text };
+            }
             res.status(response.status).json(body);
           } catch (error: any) {
             logger.error(`Error fetching Airflow health: ${error?.message}`);
@@ -81,7 +87,13 @@ export default createBackendModule({
                 headers: buildHeaders(),
               },
             );
-            const body = await response.json();
+            const text = await response.text();
+            let body: any;
+            try {
+              body = JSON.parse(text);
+            } catch {
+              body = { raw: text };
+            }
             res.status(response.status).json(body);
           } catch (error: any) {
             logger.error(`Error fetching Airflow DAGs: ${error?.message}`);

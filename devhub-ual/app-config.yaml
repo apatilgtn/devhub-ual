@@ -54,7 +54,7 @@ proxy:
   ### Example for how to add a proxy endpoint for the frontend.
   ### A typical reason to do this is to handle HTTPS and CORS for internal services.
   endpoints:
-    '/grafana/api':
+    grafana/api:
       target: http://localhost:3001
       allowedHeaders:
         - Authorization
@@ -62,7 +62,7 @@ proxy:
         Authorization: Bearer ${GRAFANA_TOKEN:-}
     
     # Apache Airflow API proxy (set AIRFLOW_BASIC_AUTH if needed)
-    '/airflow':
+    airflow:
       # In production, AIRFLOW_URL points at the Railway Airflow service.
       # The proxy forwards /api/proxy/airflow/* to the Airflow stable REST API.
       target: ${AIRFLOW_URL:-http://localhost:8080}/api/v1
@@ -77,17 +77,17 @@ proxy:
         Authorization: ${AIRFLOW_BASIC_AUTH:-}
 
     # Prometheus proxy
-    '/prometheus/api':
+    prometheus/api:
       target: http://localhost:9090
 
     # Elasticsearch proxy for status page
-    '/elasticsearch':
+    elasticsearch:
       target: http://localhost:9200
       headers:
         Authorization: Basic ${ELASTICSEARCH_BASIC_AUTH:-}
 
     # OpenMetadata API proxy
-    '/openmetadata':
+    openmetadata:
       target: http://localhost:8585
       changeOrigin: true
       secure: false

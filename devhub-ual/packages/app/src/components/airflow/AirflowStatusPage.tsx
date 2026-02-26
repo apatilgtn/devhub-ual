@@ -51,16 +51,18 @@ export const AirflowStatusPage = () => {
         if (!healthRes.ok) {
           throw new Error(`Health request failed (${healthRes.status})`);
         }
-        if (!dagsRes.ok) {
-          throw new Error(`DAG list request failed (${dagsRes.status})`);
-        }
 
         const healthJson = (await healthRes.json()) as AirflowHealth;
-        const dagsJson = (await dagsRes.json()) as DagResponse;
+        let dagRows: AirflowDag[] = [];
+
+        if (dagsRes.ok) {
+          const dagsJson = (await dagsRes.json()) as DagResponse;
+          dagRows = dagsJson.dags ?? [];
+        }
 
         if (!mounted) return;
         setHealth(healthJson);
-        setDags(dagsJson.dags ?? []);
+        setDags(dagRows);
         setLoading(false);
       } catch (e: any) {
         if (!mounted) return;
